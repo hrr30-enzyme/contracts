@@ -2,37 +2,26 @@ pragma solidity ^0.4.23;
 
 contract Question {
 
-    uint minBounty = .003 ether;
-    uint duration = 1 days;
+    uint minBounty;
+    uint duration;
     uint endTime;
     uint bounty;
     address asker;
-
-    constructor() public payable {
-        require(msg.value >= minBounty);
-        endTime = now + duration;
-        bounty = msg.value;
-    }
-}
-
-contract QuestionFactory {
-
     address owner;
 
-    address[] public questions;
+    event TimeExtended(uint endTime, uint bounty);
 
-    function getQuestionsCount() public view returns (uint questionsCount) {
-        return questions.length;
+    function extendTime() public payable questionOpen {
+        require(duration < 30 days && msg.value > minBounty);
+        bounty += minBounty;
+        endTime += duration;
+        emit TimeExtended(endTime, bounty);
     }
 
-    function newQuestion() public returns (address newContract) {
-        Question q = new Question();
-        questions.push(q);
-        return q;
-    }
 
-    constructor() public payable {
-        owner = msg.sender;
+    modifier questionOpen() {
+        require(now <= endTime);
+        _;
     }
 
     modifier onlyOwner() {
@@ -40,3 +29,4 @@ contract QuestionFactory {
         _;
     }
 }
+
