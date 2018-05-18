@@ -2,14 +2,21 @@ pragma solidity ^0.4.23;
 
 import "./Ownable.sol";
 
-contract Question is Ownable {
+contract Question {
 
+    uint minBounty = .003 ether;
     uint duration = 1 days;
     uint bounty;
-    uint minBounty = .003 ether;
+    address owner;
 
-    constructor() {
+    constructor() public {
         require(msg.value >= minBounty);
         bounty = msg.value;
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
     }
 }
