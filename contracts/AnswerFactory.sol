@@ -4,27 +4,20 @@ import "./Question.sol";
 
 contract AnswerFactory is Question {
 
-    uint answerFee = .001 ether;
+    uint answerFee;
 
     event NewAnswer(uint answerId, address answerer);
 
     struct Answer {
-        uint upvotes;
+        address owner;
+        uint16 upvotes;
     }
 
     Answer[] public answers;
 
-    mapping (uint => address) public answerToOwner;
-
-//    function setAnswerFee(uint _fee) external onlyOwner {
-//        answerFee = _fee;
-//    }
-
-    function _createAnswer() public payable {
+    function createAnswer() public payable {
         require(msg.value >= answerFee);
-        require(now < endTime || answers.length < 2);
-        uint id = answers.push(Answer(0)) - 1;
-        answerToOwner[id] = msg.sender;
+        uint id = answers.push(Answer(msg.sender, 0)) - 1;
         emit NewAnswer(id, msg.sender);
     }
 
