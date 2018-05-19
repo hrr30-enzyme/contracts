@@ -33,14 +33,14 @@ contract UpVote is AnswerFactory {
             endTime = now + 1 days;
         } else {
             uint16 _winningVotes = 0;
-            Answer winner;
+            Answer memory winner;
             for (uint a = 0; a < answers.length; a++) {
                 if (answers[a].upvotes > _winningVotes) {
                     _winningVotes = answers[a].upvotes;
                     winner = answers[a];
                 }
             }
-            winner.owner.transfer(this.balance);
+            winner.owner.transfer(address(this).balance);
         }
         
     }
