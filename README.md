@@ -1,75 +1,77 @@
-# QuestionFactory Contract
+These solidity contracts provide a decentralized way to post bounties on questions and compete to have the best answer to win the bounty.  To post a question a user most post an initial bounty.  To answer a question they must add to the questions bounty.   Users can also vote for the answer they believe is best, but only if their address is first approved to vote.
 
-## EVENTS
+## QuestionFactory Contract
 
-### NewQuestion
+### EVENTS
+
+#### NewQuestion
 
 Emitted when a new question is posted.
 
-## ONLY OWNER FUNCTIONS
+### ONLY OWNER FUNCTIONS
 
-### setMinBounty
+#### setMinBounty
 
 Sets the minimum amount needed to post a question.
 
-### setDuration
+#### setDuration
 
 Sets the length of time a question is live.
 
-## PUBLIC FUNCTIONS
+### PUBLIC FUNCTIONS
 
-### getMinBounty, getDuration, getAnswerFee
+#### getMinBounty, getDuration, getAnswerFee
 
 Returns these values.
 
-### newQuestion
+#### newQuestion
 
 Creates a new question wtiht he bounty sent to the ether sent.
 
-## MODIFIERS
+### MODIFIERS
 
 onlyOwner and questionOpen.
 
-# AnswerFactory Contract
+## AnswerFactory Contract
 
-## EVENTS
+### EVENTS
 
-### NewAnswer
+#### NewAnswer
 
 Emitted when a newAnswer is posted.
 
-## PUBLIC FUNCTIONS
+### PUBLIC FUNCTIONS
 
-## createAnswer
+### createAnswer
 
 Creates a new answer.  The user must send at least the answerFee.
 
-# UpVote Contract
+## UpVote Contract
 
-## EVENTS
+### EVENTS
 
-### NewVote
+#### NewVote
 
 Emitted whenever a new vote is cast.
 
-## PRIVATE FUNCTIONS
+### PRIVATE FUNCTIONS
 
-### didVote
+#### didVote
 
 A internal view function that checks to see if a address has voted yet.
 
-## OnlyOwner Functions
+### OnlyOwner Functions
 
-### giveRightToVote
+#### giveRightToVote
 
 Gives a ethereum address the right to vote on questions along with how much weight their vote has.
 
-## PUBLIC FUNCTIONS
+### PUBLIC FUNCTIONS
 
-### upVote
+#### upVote
 
 Increases vote count of a question based on how much weight that ethereum address was given.
 
-### payoutWinner
+#### payoutWinner
 
 Can be called anytime after the question has closed.  Calculates the highest upvoted answer and pays the the sum of all the bounties for that question and it's answers out to the winner.
