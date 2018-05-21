@@ -20,17 +20,21 @@ Emitted when a new question is posted.
 
 #### setMinBounty
 
-Sets the minimum amount needed to post a question.
+Sets the minimum amount needed to post a new question.
 
 #### setDuration
 
-Sets the length of time a question is live.
+Sets the length of time a question is live for future questions.
+
+#### setAnswerFee
+
+Sets the fee a user must pay to answer a question in future questions.
 
 ### PUBLIC FUNCTIONS
 
 #### getMinBounty, getDuration, getAnswerFee
 
-Returns these values.
+Returns the current values for any future questions.
 
 #### newQuestion
 
