@@ -3,45 +3,77 @@ pragma solidity ^0.4.23;
 import "./AnswerFactory.sol";
 
 contract UpVote is AnswerFactory {
-    
-    struct Voter {
-        uint vote;
-        bool voted;
-        uint16 reputation;
+
+    uint startingReputation = 1;
+
+    function setStartingReputation(uint _startingReputation) public onlyOwner {
+        startingReputation = _startingReputation;
     }
 
-    mapping(address => Voter) public voters;
+    struct Vote {
+        address voter;
+        uint answerId;
+    }
 
-    event NewVote(uint answerId, address answerer);
+    Vote[] public votes;
+
+    mapping(uint => uint[]) public questionIdToVoteIds;
+
+    mapping(address => uint) public reputation;
+
+    event NewVote(uint questionId, uint answerId, address answerer, uint _weight);
 
     function giveRightToVote(address _voter, uint16 _reputation) public onlyOwner {
-        voters[_voter].reputation = _reputation;
+        reputation[_voter] = _reputation;
     }
 
-    function upVote(uint _answerId) public questionOpen {
-        Voter storage sender = voters[msg.sender];
-        require(!sender.voted, "cannot vote twice");
-        sender.voted = true;
-        sender.vote = _answerId;
+    function didVote(uint _questionId, address _voter) internal view returns (bool) {
+        uint[] memory _questionVotes = questionIdToVoteIds[_questionId];
 
-        answers[_answerId].upvotes = answers[_answerId].upvotes + sender.reputation;
+        for (uint i = 0; i < _questionVotes.length; i++) {
+            address voted = votes[_questionVotes[i]].voter;
+            if (_voter == voted) {
+                return true;
+            }
+        }
+        return false;
+    } 
+
+    function upVote(uint _answerId) public questionOpen(answerIdToQuestionId[_answerId]) {
+        uint _questionId = answerIdToQuestionId[_answerId];
+        uint _weight = reputation[msg.sender];
+
+        require(_weight > 0, "Do not have permission to vote");        
+        require(!didVote(_questionId, msg.sender), "cannot vote twice");
+
+        uint _voteId = votes.push(Vote(msg.sender, _answerId)) - 1;
+        questionIdToVoteIds[_questionId].push(_voteId);
+        answers[_answerId].upvotes = answers[_answerId].upvotes + _weight;
+        
+        emit NewVote(_questionId, _answerId, msg.sender, _weight);
     }
 
-    function payoutWinner() public  {
-        require(now > endTime);
-        if (answers.length < 1) {
-            endTime = now + 1 days;
+    function payoutWinner(uint _questionId) public  {
+        Question memory _question = questions[_questionId];
+
+        require(now > _question.endTime, "Question hasn't ended yet");
+        require(!_question.payedOut, "Question already payed out");
+
+        Answer memory bestAnswer;
+        uint winningScore = 0;
+
+        if (questionIdToVoteIds[_questionId].length == 0) {
+            _question.asker.transfer(address(this).balance);
         } else {
-            uint16 _winningVotes = 0;
-            Answer memory winner;
-            for (uint a = 0; a < answers.length; a++) {
-                if (answers[a].upvotes > _winningVotes) {
-                    _winningVotes = answers[a].upvotes;
-                    winner = answers[a];
+            for (uint i = 0; i < answers.length; i++) {
+                if (answerIdToQuestionId[i] == _questionId) {
+                    if(answers[i].upvotes > winningScore) {
+                        winningScore = answers[i].upvotes;
+                        bestAnswer = answers[i];
+                    }
                 }
             }
-            winner.owner.transfer(address(this).balance);
+            bestAnswer.owner.transfer(address(this).balance);           
         }
-        
     }
 }

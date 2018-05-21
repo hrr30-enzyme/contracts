@@ -1,7 +1,5 @@
 pragma solidity ^0.4.23;
 
-import "./QuestionInterface.sol";
-
 contract QuestionFactory {
 
     address owner;
@@ -9,24 +7,89 @@ contract QuestionFactory {
     uint duration;
     uint answerFee;
 
-    address[] public questions;
+    event NewQuestion(
+        uint questionId,
+        uint minBounty,
+        uint duration,
+        uint endTime,
+        uint bounty,
+        address asker,
+        uint answerFee
+    );
 
-    function getQuestionsCount() public view returns (uint questionsCount) {
-        return questions.length;
+    struct Question {
+        uint minBounty;
+        uint duration;
+        uint endTime;
+        uint bounty;
+        address asker;
+        uint answerFee;
+        bool payedOut;
     }
 
-    function newQuestion() public payable returns (address newContract) {
+    Question[] public questions;
+
+    function getQuestionsCount() public view returns (uint) {
+        return questions.length;
+    }
+    
+    function getMinBounty() public view returns (uint) {
+        return minBounty;
+    }
+    
+    function setMinBounty(uint _minBounty) public onlyOwner{
+        minBounty = _minBounty;
+    }
+    
+    function getDuration() public view returns (uint) {
+        return duration;
+    }
+    
+    function setDuration(uint _duration) public onlyOwner {
+        duration = _duration;
+    }
+    
+    function getAnswerFee() public view returns (uint) {
+        return answerFee;
+    }
+    
+    function setAnswerFee(uint _answerFee) public onlyOwner {
+        answerFee = _answerFee;
+    }
+
+    function newQuestion() public payable {
         require(msg.value > minBounty);
         
-        Question q = (new QuestionInterface).value(msg.value)(minBounty, duration, msg.sender, answerFee);
-        
-        questions.push(q);
-        
-        return q;
+        uint _endTime = now + duration;
+
+        uint id = questions.push(Question(
+            minBounty,
+            duration,
+            _endTime,
+            msg.value,
+            msg.sender,
+            answerFee,
+            false
+        )) - 1;
+
+        emit NewQuestion(
+            id,
+            minBounty,
+            duration,
+            _endTime,
+            msg.value,
+            msg.sender,
+            answerFee
+        );
     }
 
     constructor() public {
         owner = msg.sender;
+    }
+
+    modifier questionOpen(uint _questionId) {
+        require(now <= questions[_questionId].endTime);
+        _;
     }
 
     modifier onlyOwner() {

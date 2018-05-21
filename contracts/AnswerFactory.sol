@@ -1,24 +1,24 @@
 pragma solidity ^0.4.23;
 
-import "./Question.sol";
+import "./QuestionFactory.sol";
 
-contract AnswerFactory is Question {
+contract AnswerFactory is QuestionFactory {
 
-    uint answerFee;
-
-    event NewAnswer(uint answerId, address answerer);
+    event NewAnswer(uint questionId, uint answerId, address answerer);
 
     struct Answer {
         address owner;
-        uint16 upvotes;
+        uint upvotes;
     }
+
+    mapping(uint => uint) public answerIdToQuestionId;
 
     Answer[] public answers;
 
-    function createAnswer() public payable {
-        require(msg.value >= answerFee);
+    function createAnswer(uint _questionId) public payable {
+        require(msg.value >= questions[_questionId].answerFee);
         uint id = answers.push(Answer(msg.sender, 0)) - 1;
-        emit NewAnswer(id, msg.sender);
+        emit NewAnswer(_questionId, id, msg.sender);
     }
 
 }
