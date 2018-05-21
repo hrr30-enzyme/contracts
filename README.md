@@ -1,4 +1,12 @@
-These solidity contracts provide a decentralized way to post bounties on questions and compete to have the best answer to win the bounty.  To post a question a user most post an initial bounty.  To answer a question they must add to the questions bounty.   Users can also vote for the answer they believe is best, but only if their address is first approved to vote.
+These contracts provide a decentralized way to post bounties on questions and compete to have the best answer to win the bounty.  To post a question a user most post an initial bounty.  To answer a question they must add to the questions bounty.   Users can also vote for the answer they believe is best, but only if their address is first approved to vote.
+
+They were created using truffle with Ganache and tested with Remix and the Rinkeby network.
+
+The user interface was created with React/Redux with web3.
+
+#### URL
+
+https://hrr30-enzyme-frontend.herokuapp.com/
 
 ## QuestionFactory Contract
 
