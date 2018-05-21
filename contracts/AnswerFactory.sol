@@ -15,7 +15,7 @@ contract AnswerFactory is QuestionFactory {
 
     Answer[] public answers;
 
-    function createAnswer(uint _questionId) public payable {
+    function createAnswer(uint _questionId) public payable questionOpen(_questionId) {
         require(msg.value >= questions[_questionId].answerFee);
         uint id = answers.push(Answer(msg.sender, 0)) - 1;
         emit NewAnswer(_questionId, id, msg.sender);

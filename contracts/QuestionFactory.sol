@@ -9,8 +9,6 @@ contract QuestionFactory {
 
     event NewQuestion(
         uint questionId,
-        uint minBounty,
-        uint duration,
         uint endTime,
         uint bounty,
         address asker,
@@ -18,8 +16,6 @@ contract QuestionFactory {
     );
 
     struct Question {
-        uint minBounty;
-        uint duration;
         uint endTime;
         uint bounty;
         address asker;
@@ -63,8 +59,6 @@ contract QuestionFactory {
         uint _endTime = now + duration;
 
         uint id = questions.push(Question(
-            minBounty,
-            duration,
             _endTime,
             msg.value,
             msg.sender,
@@ -74,8 +68,6 @@ contract QuestionFactory {
 
         emit NewQuestion(
             id,
-            minBounty,
-            duration,
             _endTime,
             msg.value,
             msg.sender,

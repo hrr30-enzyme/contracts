@@ -4,12 +4,6 @@ import "./AnswerFactory.sol";
 
 contract UpVote is AnswerFactory {
 
-    uint startingReputation = 1;
-
-    function setStartingReputation(uint _startingReputation) public onlyOwner {
-        startingReputation = _startingReputation;
-    }
-
     struct Vote {
         address voter;
         uint answerId;
@@ -53,27 +47,29 @@ contract UpVote is AnswerFactory {
         emit NewVote(_questionId, _answerId, msg.sender, _weight);
     }
 
-    function payoutWinner(uint _questionId) public  {
-        Question memory _question = questions[_questionId];
+    function payoutWinner(uint _questionId) public questionOpen(_questionId) {
 
-        require(now > _question.endTime, "Question hasn't ended yet");
-        require(!_question.payedOut, "Question already payed out");
+        require(!questions[_questionId].payedOut, "Question already payed out");
 
         Answer memory bestAnswer;
         uint winningScore = 0;
+        uint winningBounty = questions[_questionId].bounty;
+        uint answerFee = questions[_questionId].answerFee;
 
         if (questionIdToVoteIds[_questionId].length == 0) {
-            _question.asker.transfer(address(this).balance);
+            questions[_questionId].asker.transfer(address(this).balance);
         } else {
             for (uint i = 0; i < answers.length; i++) {
                 if (answerIdToQuestionId[i] == _questionId) {
+                    winningBounty = winningBounty + answerFee;
                     if(answers[i].upvotes > winningScore) {
                         winningScore = answers[i].upvotes;
                         bestAnswer = answers[i];
                     }
                 }
             }
-            bestAnswer.owner.transfer(address(this).balance);           
+            questions[_questionId].payedOut = true;
+            bestAnswer.owner.transfer(winningBounty);           
         }
     }
 }
