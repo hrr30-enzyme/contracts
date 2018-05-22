@@ -1,5 +1,9 @@
 pragma solidity ^0.4.23;
 
+/*
+ * the Migrations contract comes with truffle to help deploy contracts
+ */
+ 
 contract Migrations {
     address public owner;
     uint public last_completed_migration;
