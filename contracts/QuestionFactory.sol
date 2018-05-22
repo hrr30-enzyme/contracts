@@ -92,7 +92,7 @@ contract QuestionFactory is Ownable {
      * then it sets the endTime and pushes the question to the questions Array.
      * finally it emits that the NewQuestion event to the network.
      */
-    function newQuestion() public payable {
+    function createQuestion() public payable {
 
         require(msg.value > minBounty);
         
