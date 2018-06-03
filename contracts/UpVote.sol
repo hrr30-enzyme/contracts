@@ -46,14 +46,7 @@ contract UpVote is AnswerFactory {
      * giveRightToVote is how the owner gives users the ability to vote.
      */
 
-    /*
-     *
-     * WARNING WARNING WARNING WARNING!
-     * WARNING WARNING WARNING WARNING!
-     *
-     * this should be a onlyOwner function in production
-     */
-    function giveRightToVote(address _voter, uint16 _reputation) public  {
+    function giveRightToVote(address _voter, uint16 _reputation) public onlyOwner  {
         reputation[_voter] = _reputation;
     }
 
